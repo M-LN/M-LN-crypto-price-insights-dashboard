@@ -1,0 +1,116 @@
+name: Daily Crypto Insights Pipeline
+
+on:
+  schedule:
+    # Run daily at 6 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  update-insights:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Create data directories
+      run: |
+        mkdir -p data/processed
+        mkdir -p data/raw
+        mkdir -p models
+        
+    - name: Run pipeline for Bitcoin
+      env:
+        PYTHONPATH: ${{ github.workspace }}/src
+      run: |
+        python scripts/run_pipeline.py \
+          --coin-id bitcoin \
+          --days 90 \
+          --export data/processed/btc_latest.csv
+          
+    - name: Run pipeline for Ethereum
+      env:
+        PYTHONPATH: ${{ github.workspace }}/src
+      run: |
+        python scripts/run_pipeline.py \
+          --coin-id ethereum \
+          --days 90 \
+          --export data/processed/eth_latest.csv
+          
+    - name: Generate summary report
+      env:
+        PYTHONPATH: ${{ github.workspace }}/src
+      run: |
+        python -c "
+        import json
+        from datetime import datetime
+        from pathlib import Path
+        from src.crypto_dashboard.pipeline import run_pipeline
+        
+        # Run analysis for multiple coins
+        coins = ['bitcoin', 'ethereum', 'cardano']
+        summary = {
+            'timestamp': datetime.now().isoformat(),
+            'coins': {}
+        }
+        
+        for coin in coins:
+            try:
+                results = run_pipeline(coin_id=coin, days=30)
+                summary['coins'][coin] = {
+                    'latest_price': results['metrics']['latest_price'],
+                    'daily_volatility': results['metrics']['daily_volatility'],
+                    'cumulative_return': results['metrics']['cumulative_return'],
+                    'insights': results['insights'][:2]  # First 2 insights
+                }
+            except Exception as e:
+                summary['coins'][coin] = {'error': str(e)}
+        
+        # Save summary
+        Path('data/processed/daily_summary.json').write_text(
+            json.dumps(summary, indent=2)
+        )
+        print(f'Generated summary for {len(summary[\"coins\"])} coins')
+        "
+        
+    - name: Commit and push if data changed
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add data/processed/
+        
+        # Only commit if there are changes
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Daily update: Crypto insights $(date -u +%Y-%m-%d)"
+          git push
+        fi
+        
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: crypto-insights-data
+        path: |
+          data/processed/*.csv
+          data/processed/*.json
+        retention-days: 30

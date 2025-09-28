@@ -1,0 +1,106 @@
+name: ML Model Training
+
+on:
+  workflow_dispatch:  # Manual trigger only
+    inputs:
+      coin_id:
+        description: 'Cryptocurrency to train model for'
+        required: true
+        default: 'bitcoin'
+      days:
+        description: 'Number of days of historical data'
+        required: true
+        default: '365'
+
+jobs:
+  train-model:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Create directories
+      run: |
+        mkdir -p models
+        mkdir -p data/processed
+        
+    - name: Train ML model
+      env:
+        PYTHONPATH: ${{ github.workspace }}/src
+      run: |
+        python -c "
+        import json
+        from pathlib import Path
+        from src.crypto_dashboard.api import CoinGeckoClient, MarketDataRequest
+        from src.crypto_dashboard.ml import train_direction_predictor
+        
+        # Fetch data
+        client = CoinGeckoClient()
+        request = MarketDataRequest(
+            coin_id='${{ github.event.inputs.coin_id }}',
+            days=${{ github.event.inputs.days }}
+        )
+        price_data = client.market_chart(request)
+        
+        # Train model
+        model_path = Path('models/${{ github.event.inputs.coin_id }}_direction_model.joblib')
+        predictor, results = train_direction_predictor(price_data, model_path)
+        
+        # Save results
+        results_path = Path('models/${{ github.event.inputs.coin_id }}_training_results.json')
+        
+        # Convert numpy types to native Python for JSON serialization
+        def convert_numpy(obj):
+            if hasattr(obj, 'item'):
+                return obj.item()
+            elif hasattr(obj, 'tolist'):
+                return obj.tolist()
+            return obj
+        
+        serializable_results = {
+            'coin_id': '${{ github.event.inputs.coin_id }}',
+            'training_days': ${{ github.event.inputs.days }},
+            'metrics': {k: convert_numpy(v) for k, v in results['metrics'].items()},
+            'feature_importance': {k: convert_numpy(v) for k, v in results['feature_importance'].items()},
+            'confusion_matrix': results['confusion_matrix']
+        }
+        
+        results_path.write_text(json.dumps(serializable_results, indent=2))
+        
+        print(f'Model trained for ${{ github.event.inputs.coin_id }}')
+        print(f'Test accuracy: {results[\"metrics\"][\"test_accuracy\"]:.3f}')
+        print(f'CV score: {results[\"metrics\"][\"cv_mean\"]:.3f}±{results[\"metrics\"][\"cv_std\"]:.3f}')
+        "
+        
+    - name: Upload model artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ml-model-${{ github.event.inputs.coin_id }}
+        path: |
+          models/${{ github.event.inputs.coin_id }}_direction_model.joblib
+          models/${{ github.event.inputs.coin_id }}_training_results.json
+        retention-days: 90
+        
+    - name: Commit trained model
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add models/
+        
+        if git diff --staged --quiet; then
+          echo "No model changes to commit"
+        else
+          git commit -m "Add trained ML model for ${{ github.event.inputs.coin_id }}"
+          git push
+        fi
