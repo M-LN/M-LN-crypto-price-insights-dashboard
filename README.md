@@ -1,117 +1,181 @@
-# 🚀 Crypto Price Insights Dashboard
+# 📊 Crypto Price Insights Dashboard
 
-A professional cryptocurrency market analysis dashboard with machine learning capabilities. This portfolio project showcases real-time data processing, advanced analytics, and ML-powered price direction predictions.
+A cryptocurrency price tracking and analytics dashboard built with Python.
 
-## ✨ Key Features
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
 
-### 📊 **Real-Time Analytics**
-- Live cryptocurrency market data (Bitcoin, Ethereum, Cardano, Solana)
-- 11 technical indicators (moving averages, volatility, momentum, drawdowns)
-- Interactive price charts and performance metrics
-- Professional web dashboard with Streamlit
+> **📌 Repository Setup Reminder:**
+> - Add description: "Cryptocurrency price insights dashboard with real-time tracking and analytics"
+> - Add topics: `python`, `cryptocurrency`, `bitcoin`, `dashboard`, `data-visualization`, `analytics`
+> - Set these in GitHub Repository Settings → About section
 
-### 🤖 **Machine Learning**
-- Next-day price direction prediction (UP/DOWN)
-- Gradient boosting classifier with cross-validation
-- Feature importance analysis and confidence scores
-- Model persistence and automatic training
+## 🚀 Features
 
-### 🔧 **Production Ready**
-- Comprehensive test suite (12/12 tests passing)
-- GitHub Actions automation workflows
-- Clean, modular architecture
-- Professional error handling and caching
+- 💹 Real-time cryptocurrency price tracking (Bitcoin, Ethereum, Cardano, Solana)
+- 📈 Interactive price charts and visualizations with Plotly
+- 📊 Advanced market analytics with 11 technical indicators
+- 🤖 Machine learning-powered price direction predictions
+- 📉 Historical data analysis with moving averages and volatility metrics
+- 💰 Multi-currency support with CoinGecko API integration
+- 🎯 Next-day price direction forecasting using gradient boosting
+- ✅ Production-ready with comprehensive test coverage
 
-## 🚀 Quick Start
+## 🛠️ Technologies Used
+
+This project leverages modern Python technologies and libraries:
+
+- **Python 3.8+** - Core programming language
+- **Streamlit** - Interactive web dashboard framework
+- **pandas** - Data manipulation and analysis
+- **NumPy** - Numerical computing
+- **scikit-learn** - Machine learning models (Gradient Boosting Classifier)
+- **Plotly & Matplotlib** - Data visualization and charting
+- **requests** - API communication
+- **CoinGecko API** - Real-time cryptocurrency market data
+- **pytest** - Testing framework
+- **GitHub Actions** - CI/CD automation
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Python 3.8 or higher
+- pip (Python package installer)
+- Git
 
 ### Installation
+
+1. Clone the repository:
 ```bash
-git clone https://github.com/M-LN/crypto-price-insights-dashboard.git
-cd crypto-price-insights-dashboard
+git clone https://github.com/M-LN/M-LN-crypto-price-insights-dashboard.git
+cd M-LN-crypto-price-insights-dashboard
+```
+
+2. Install required dependencies:
+```bash
 pip install -r requirements.txt
 ```
 
-### Run Dashboard
+## 📖 Usage
+
+### Running the Dashboard
+
+Launch the Streamlit web application:
+
 ```bash
 streamlit run streamlit_app.py
 ```
-Opens at `http://localhost:8501`
 
-### Test ML Demo
+The dashboard will open in your browser at `http://localhost:8501`
+
+### Using the Dashboard
+
+1. **Select Cryptocurrency**: Choose from Bitcoin, Ethereum, Cardano, or Solana in the sidebar
+2. **Configure Timeframe**: Adjust the slider to select days of historical data (7-90 days)
+3. **View Analytics**: Explore real-time price charts and technical indicators
+4. **Enable ML Predictions**: Check the "Enable ML Predictions" checkbox in the sidebar
+5. **Generate Forecast**: Click "🎯 Generate ML Prediction" to get next-day price direction
+6. **Explore Insights**: Review key insights, performance metrics, and technical analysis
+
+### Running the ML Demo
+
+Test the machine learning functionality standalone:
+
 ```bash
 python demo_ml.py
 ```
 
-## 🎮 How to Use
+### Running Tests
 
-1. **Select Cryptocurrency**: Choose Bitcoin, Ethereum, etc.
-2. **Configure Timeframe**: Adjust days of historical data (7-90)
-3. **Enable ML Predictions**: Check the ML checkbox in sidebar
-4. **Generate Forecast**: Click "🎯 Generate ML Prediction"
-5. **View Results**: See direction, confidence, and model performance
-6. **Explore Analysis**: Check technical indicators and charts
-
-## 🧪 Testing
+Execute the test suite to verify functionality:
 
 ```bash
 python -m pytest tests/ -v
-# ✅ 12/12 tests passing
 ```
 
-## 📈 ML Performance
+> **Note**: Add screenshots of the dashboard here when available to showcase the UI
 
-- **Algorithm**: Gradient Boosting Classifier
-- **Accuracy**: ~50-55% (better than random)
-- **Features**: 11 technical indicators
-- **Validation**: 5-fold cross-validation
-- **Output**: Direction (UP/DOWN) + Confidence %
-
-## 🏗️ Architecture
+## 📁 Project Structure
 
 ```
-├── src/crypto_dashboard/    # Core package
-│   ├── api.py              # CoinGecko API client
-│   ├── processing.py       # Feature engineering
-│   ├── ml.py               # Machine learning
-│   ├── insights.py         # Analytics
-│   └── visuals.py          # Plotting
-├── tests/                  # Test suite
-├── models/                 # Trained ML models
-├── .github/workflows/      # Automation
-└── streamlit_app.py        # Web dashboard
+M-LN-crypto-price-insights-dashboard/
+├── src/
+│   └── crypto_dashboard/      # Core application package
+│       ├── __init__.py
+│       ├── api.py              # CoinGecko API client
+│       ├── processing.py       # Data processing and feature engineering
+│       ├── ml.py               # Machine learning models
+│       ├── insights.py         # Analytics and insights generation
+│       ├── visuals.py          # Plotting and visualization
+│       └── pipeline.py         # Data pipeline orchestration
+├── tests/                      # Test suite
+│   ├── test_ml.py
+│   └── test_processing.py
+├── scripts/                    # Utility scripts
+│   └── run_pipeline.py
+├── models/                     # Trained ML models (persisted)
+├── notebooks/                  # Jupyter notebooks for exploration
+├── .github/
+│   └── workflows/              # GitHub Actions automation
+│       ├── daily-pipeline.yml
+│       └── train-model.yml
+├── streamlit_app.py            # Main web dashboard application
+├── demo_ml.py                  # ML demonstration script
+├── requirements.txt            # Python dependencies
+├── LICENSE                     # MIT License
+└── README.md                   # This file
 ```
 
-## 🔄 Automation
+## ⚙️ Configuration
 
-- **Daily Data Pipeline**: Automated collection at 6 AM UTC
-- **Model Training**: On-demand via GitHub Actions
-- **Testing**: Continuous integration
-- **Deployment**: Cloud-ready with Docker support
+### API Keys
 
-## 🌟 Portfolio Value
+This project uses the **CoinGecko API** which doesn't require an API key for basic usage. If you plan to make extensive API calls, consider:
 
-This project demonstrates:
-- **Full-Stack ML**: API → Processing → ML → Web App
-- **Production Practices**: Testing, automation, monitoring
-- **Modern Tech Stack**: Python, scikit-learn, Streamlit
-- **Professional Code**: Clean architecture, documentation
+- Setting up rate limiting
+- Using the CoinGecko Pro API with authentication
+- Implementing caching (already included in the dashboard)
 
-## 📊 Tech Stack
+### Customization
 
-- **Backend**: Python, pandas, numpy, scikit-learn
-- **Frontend**: Streamlit, plotly, matplotlib
-- **API**: CoinGecko cryptocurrency data
-- **ML**: Gradient boosting, feature engineering
-- **Testing**: pytest with comprehensive coverage
-- **Automation**: GitHub Actions workflows
+You can customize the dashboard by modifying:
 
-## 🚀 Extension Ideas
+- **Cryptocurrency list**: Edit the selectbox options in `streamlit_app.py`
+- **Technical indicators**: Adjust calculations in `src/crypto_dashboard/processing.py`
+- **ML model parameters**: Modify hyperparameters in `src/crypto_dashboard/ml.py`
+- **Visualization styles**: Update chart configurations in `streamlit_app.py` and `src/crypto_dashboard/visuals.py`
 
-- **Advanced ML**: LSTM, ensemble methods, sentiment analysis
-- **Data Storage**: PostgreSQL, data lakes, real-time streaming
-- **Deployment**: Azure/AWS hosting, load balancing
-- **Features**: Portfolio optimization, risk management, alerts
+## 🤝 Contributing
+
+Contributions are welcome! Here's how you can help:
+
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Make your changes**
+4. **Run tests**: `python -m pytest tests/ -v`
+5. **Commit your changes**: `git commit -m 'Add amazing feature'`
+6. **Push to the branch**: `git push origin feature/amazing-feature`
+7. **Open a Pull Request**
+
+### Contribution Guidelines
+
+- Write clear, descriptive commit messages
+- Add tests for new features
+- Update documentation as needed
+- Follow existing code style and conventions
+- Ensure all tests pass before submitting PR
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+## 📧 Contact
+
+**M-LN** - [@M-LN](https://github.com/M-LN)
+
+Project Link: [https://github.com/M-LN/M-LN-crypto-price-insights-dashboard](https://github.com/M-LN/M-LN-crypto-price-insights-dashboard)
 
 ---
 
-**Built as a comprehensive data science portfolio project showcasing modern ML and web development practices.** 🎯
+**Built with ❤️ using Python, Streamlit, and Machine Learning** 🚀
